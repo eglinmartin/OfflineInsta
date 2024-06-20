@@ -82,7 +82,6 @@ class MainWindow(QMainWindow):
         self.main_title.setFont(QFont("Verdana", 24))
         self.main_title.setFixedWidth(850)
         self.main_title.setFixedHeight(100)
-        self.main_title.setAlignment(Qt.AlignVCenter)
         self.main_title.setWordWrap(True)
         self.main_title.setStyleSheet("color: #00FFFF;")
 
