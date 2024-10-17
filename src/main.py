@@ -6,11 +6,8 @@ __author__ = "Your Name"
 __version__ = "0.1.0"
 __license__ = "MIT"
 
-profile = 'EchoRope'
-starting_post = '20240818_01'
-
-# profile = 'Various Images'
-# starting_post = '20230910_01'
+profile = 'Test'
+starting_post = '1000'
 
 import json
 import sys
@@ -27,7 +24,7 @@ def exit_program():
 
 
 def get_num_photos(post):
-    return len(os.listdir(fr"C:\Storage\Coding/Python Apps\OfflineInsta\data\profiles\{profile}\photos\{post}")) - 1
+    return len(os.listdir(fr"C:\Storage\Coding/Python Apps\OfflineInsta\data\profiles\{profile}\{post}")) - 1
 
 
 class ThumbnailBox(QScrollArea):
@@ -65,12 +62,12 @@ class ThumbnailImage(QPushButton):
         self.clicked.connect(self.cmd)
 
     def cmd(self):
-        self.window.window.main_image.setStyleSheet(fr"border-image: url(C:/Storage/Coding/Python Apps/OfflineInsta/data/profiles/{profile}/photos/{self.post}/{self.post} (1).jpg);" f"border : none")
+        self.window.window.main_image.setStyleSheet(fr"border-image: url(C:/Storage/Coding/Python Apps/OfflineInsta/data/profiles/{profile}/{self.post}/{self.post} (1).jpg);" f"border : none")
         self.window.window.main_title.setText(self.profile_data['posts'][self.post]['title'])
 
-        date = datetime.strptime(self.post.split('_')[0], "%Y%m%d")
+        date = datetime.strptime(self.profile_data['posts'][self.post]['date'], "%Y-%m-%d")
         date_formatted = datetime.strftime(date, '%Y/%m/%d')
-        self.window.window.main_text.setText(f"{date_formatted} - {self.profile_data['posts'][self.post]['text']}")
+        self.window.window.main_text.setText(f"{date_formatted} - {self.profile_data['posts'][self.post]['description']}")
         self.window.window.selected_post = self.post
         self.window.window.current_photo = 1
         # self.window.window.label_photo_number.setText(f"1 / {get_num_photos(self.window.window.selected_post)}")
@@ -97,19 +94,18 @@ class ScrollButton(QPushButton):
         if self.direction == 'left':
             if self.window.current_photo > 1:
                 self.window.current_photo -= 1
-                self.window.main_image.setStyleSheet(fr"border-image: url(C:/Storage/Coding/Python Apps/OfflineInsta/data/profiles/{profile}/photos/{self.window.selected_post}/{self.window.selected_post} ({str(self.window.current_photo)}).jpg);" f"border : none")
+                self.window.main_image.setStyleSheet(fr"border-image: url(C:/Storage/Coding/Python Apps/OfflineInsta/data/profiles/{profile}/{self.window.selected_post}/{self.window.selected_post} ({str(self.window.current_photo)}).jpg);" f"border : none")
                 # self.window.label_photo_number.setText(f"{self.window.current_photo} / {self.num_photos}")
         elif self.direction == 'right':
             if self.window.current_photo < self.num_photos:
                 self.window.current_photo += 1
-                self.window.main_image.setStyleSheet(fr"border-image: url(C:/Storage/Coding/Python Apps/OfflineInsta/data/profiles/{profile}/photos/{self.window.selected_post}/{self.window.selected_post} ({str(self.window.current_photo)}).jpg);" f"border : none")
+                self.window.main_image.setStyleSheet(fr"border-image: url(C:/Storage/Coding/Python Apps/OfflineInsta/data/profiles/{profile}/{self.window.selected_post}/{self.window.selected_post} ({str(self.window.current_photo)}).jpg);" f"border : none")
                 # self.window.label_photo_number.setText(f"{self.window.current_photo} / {self.num_photos}")
 
 
 class MainWindow(QMainWindow):
     def __init__(self, profile_data):
         super().__init__()
-        self.setWindowTitle(profile_data['username'])
         self.setFixedWidth(1920)
         self.setFixedHeight(1200)
         self.setStyleSheet('background-color: #000000;')  #TODO: Make this an option you can change
@@ -118,26 +114,6 @@ class MainWindow(QMainWindow):
 
         self.selected_post = starting_post  #TODO: Make this the most recent photo set
         self.current_photo = 1
-
-        # Draw profile name
-        # self.profile_name = QLabel(profile_data['username'], self)
-        # self.profile_name.move(372, 97)  # Set the position of the label
-        # self.profile_name.setFont(QFont("Verdana", 64))
-        # self.profile_name.adjustSize()
-        # self.profile_name.setStyleSheet("color: #00FFFF;")
-
-        # # Draw profile picture
-        # self.profile_picture = QLabel(self)
-        # self.profile_picture.resize(220, 220)
-        # self.profile_picture.move(100, 100)
-        # self.profile_picture.setStyleSheet(fr"border-image : url(C:/Storage/Coding/Python Apps/OfflineInsta/bin/ui/profile_border_temp.png);" f"border : none")
-
-        # Draw profile bio
-        # self.profile_bio = QLabel(f"{profile_data['role']}\n{profile_data['city']}, {profile_data['country']}", self)
-        # self.profile_bio.move(375, 210)  # Set the position of the label
-        # self.profile_bio.setFont(QFont("Verdana", 32))
-        # self.profile_bio.adjustSize()
-        # self.profile_bio.setStyleSheet("color: #205252;")
 
         # Draw exit button
         self.exit_button = QPushButton(self)
@@ -149,7 +125,7 @@ class MainWindow(QMainWindow):
 
         # Draw main image
         self.main_image = MainImage(self, x=870, y=50)
-        self.main_image.setStyleSheet(fr"border-image: url(C:/Storage/Coding/Python Apps/OfflineInsta/data/profiles/{profile}/photos/{self.selected_post}/{self.selected_post} (1).jpg);" f"border : none")
+        self.main_image.setStyleSheet(fr"border-image: url(C:/Storage/Coding/Python Apps/OfflineInsta/data/profiles/{profile}/{self.selected_post}/{self.selected_post} (1).jpg);" f"border : none")
 
         # Draw thumbnail section
         self.scroll = ThumbnailBox(self)
@@ -157,7 +133,7 @@ class MainWindow(QMainWindow):
         self.scroll.inner.setFixedHeight((260*num_rows)+(10*(num_rows-1)))
         for i, post in enumerate(reversed(profile_data['posts'])):
             self.image = ThumbnailImage(self.scroll.inner, post, profile_data, x=260*(i%3), y=260*(i//3),
-                                        fpath=f"C:/Storage/Coding/Python Apps/OfflineInsta/data/profiles/{profile}/photos/{post}/{post} (0).jpg")
+                                        fpath=f"C:/Storage/Coding/Python Apps/OfflineInsta/data/profiles/{profile}/{post}/{post} (0).jpg")
 
         # Draw main title
         self.main_title = QLabel(self)
@@ -180,9 +156,9 @@ class MainWindow(QMainWindow):
         self.main_text.setWordWrap(True)
         self.main_text.setStyleSheet("color: #ffffff;")
 
-        self.date = datetime.strptime(self.selected_post.split('_')[0], "%Y%m%d")
+        self.date = datetime.strptime(profile_data['posts'][self.selected_post]['date'], "%Y-%m-%d")
         self.date_formatted = datetime.strftime(self.date, '%Y/%m/%d')
-        self.main_text.setText(f"{self.date_formatted} - {profile_data['posts'][self.selected_post]['text']}")
+        self.main_text.setText(f"{self.date_formatted} - {profile_data['posts'][self.selected_post]['description']}")
 
         # Draw left button
         self.button_left = ScrollButton(self, direction='left')
