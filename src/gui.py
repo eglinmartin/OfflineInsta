@@ -1,5 +1,3 @@
-import os
-
 from PyQt5.QtWidgets import QLabel, QPushButton, QScrollArea, QFrame, QVBoxLayout
 from PyQt5.QtGui import QFont, QCursor
 from PyQt5.QtCore import Qt
@@ -49,9 +47,8 @@ class ScrollButton(QPushButton):
         self.window = window
         self.direction = direction
         self.profile = profile
-        self.clicked.connect(self.change_photo)
+        self.clicked.connect(self.cmd)
         self.setCursor(QCursor(Qt.PointingHandCursor))
-        self.num_photos = self.get_num_photos()
 
         self.resize(140, 140)
         self.move(1730, y)
@@ -59,27 +56,29 @@ class ScrollButton(QPushButton):
         self.setFont(QFont("Verdana", 40))
         self.setText(text)
 
-    def get_num_photos(self):
-        for post in self.window.photosets:
-            if post.post_id == self.window.selected_post:
-                return len(os.listdir(fr"C:\Storage\Coding/Python Apps\OfflineInsta\data\profiles\{self.profile}\{post.post_id}")) - 1
+    def cmd(self):
+        self.window.change_photo(direction=self.direction)
 
-    def change_photo(self):
-        self.num_photos = self.get_num_photos()
-        if self.direction == 'left':
-            if self.window.current_photo > 1:
-                self.window.current_photo -= 1
-                self.window.main_image.setStyleSheet(fr"border-image: url(C:/Storage/Coding/Python Apps/OfflineInsta/data/profiles/{self.profile}/{self.window.selected_post}/{self.window.selected_post} ({str(self.window.current_photo)}).jpg);" f"border : none")
-        elif self.direction == 'right':
-            if self.window.current_photo < self.num_photos:
-                self.window.current_photo += 1
-                self.window.main_image.setStyleSheet(fr"border-image: url(C:/Storage/Coding/Python Apps/OfflineInsta/data/profiles/{self.profile}/{self.window.selected_post}/{self.window.selected_post} ({str(self.window.current_photo)}).jpg);" f"border : none")
+
+class MenuButton(QPushButton):
+    def __init__(self, window, n, text):
+        super().__init__(window)
+        self.resize(146, 180)
+        self.move(50+((146+10)*(n-1)), 50)
+        self.setCursor(QCursor(Qt.PointingHandCursor))
+        self.clicked.connect(self.cmd)
+        self.setStyleSheet("background-color: #000000; color: #ffffff")
+        self.setFont(QFont("Verdana", 16))
+        self.setText(text)
+
+    def cmd(self):
+        pass
 
 
 class TitleText(QLabel):
     def __init__(self, window):
         super().__init__(window)
-        self.move(870, 830)  # Set the position of the label
+        self.move(870, 830)
         self.setFont(QFont("Bahnschrift", 36))
         self.setFixedWidth(850)
         self.setFixedHeight(100)
@@ -90,7 +89,7 @@ class TitleText(QLabel):
 class DescriptionText(QLabel):
     def __init__(self, window):
         super().__init__(window)
-        self.move(870, 950)  # Set the position of the label
+        self.move(870, 950)
         self.setFont(QFont("Verdana", 12))
         self.setFixedWidth(800)
         self.setFixedHeight(200)
